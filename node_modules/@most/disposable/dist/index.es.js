@@ -1,0 +1,134 @@
+import { curry2, curry3, reduce } from '@most/prelude';
+
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
+
+var dispose = function (disposable) { return disposable.dispose(); };
+
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
+
+var disposeNone = function () { return NONE; };
+var NONE = new ((function () {
+  function DisposeNone () {}
+
+  DisposeNone.prototype.dispose = function dispose () {};
+
+  return DisposeNone;
+}()))();
+
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
+
+// Wrap an existing disposable (which may not already have been once()d)
+// so that it will only dispose its underlying resource at most once.
+var disposeOnce = function (disposable) { return new DisposeOnce(disposable); };
+
+var DisposeOnce = function DisposeOnce (disposable) {
+  this.disposed = false;
+  this.disposable = disposable;
+};
+
+DisposeOnce.prototype.dispose = function dispose () {
+  if (!this.disposed) {
+    this.disposed = true;
+    this.disposable.dispose();
+    this.disposable = undefined;
+  }
+};
+
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
+// Create a Disposable that will use the provided
+// dispose function to dispose the resource
+var disposeWith = curry2(function (dispose, resource) { return disposeOnce(new DisposeWith(dispose, resource)); });
+
+// Disposable represents a resource that must be
+// disposed/released. It aggregates a function to dispose
+// the resource and a handle to a key/id/handle/reference
+// that identifies the resource
+var DisposeWith = function DisposeWith (dispose, resource) {
+  this._dispose = dispose;
+  this._resource = resource;
+};
+
+DisposeWith.prototype.dispose = function dispose () {
+  this._dispose(this._resource);
+};
+
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
+// Aggregate a list of disposables into a DisposeAll
+var disposeAll = function (ds) { return new DisposeAll(ds); };
+
+// Convenience to aggregate 2 disposables
+var disposeBoth = curry2(function (d1, d2) { return disposeAll([d1, d2]); });
+
+var DisposeAll = function DisposeAll (disposables) {
+  this.disposables = disposables;
+};
+
+DisposeAll.prototype.dispose = function dispose () {
+  throwIfErrors(disposeCollectErrors(this.disposables));
+};
+
+// Dispose all, safely collecting errors into an array
+var disposeCollectErrors = function (disposables) { return reduce(appendIfError, [], disposables); };
+
+// Call dispose and if throws, append thrown error to errors
+var appendIfError = function (errors, d) {
+  try {
+    d.dispose();
+  } catch (e) {
+    errors.push(e);
+  }
+  return errors
+};
+
+// Throw DisposeAllError if errors is non-empty
+var throwIfErrors = function (errors) {
+  if (errors.length > 0) {
+    throw new DisposeAllError(((errors.length) + " errors"), errors)
+  }
+};
+
+// Aggregate Error type for DisposeAll
+var DisposeAllError = (function (Error) {
+  function DisposeAllError (message, errors) {
+    Error.call(this, message);
+    this.message = message;
+    this.name = this.constructor.name;
+    this.errors = errors;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+
+    this.stack = "" + (this.stack) + (formatErrorStacks(this.errors));
+  }
+
+  if ( Error ) DisposeAllError.__proto__ = Error;
+  DisposeAllError.prototype = Object.create( Error && Error.prototype );
+  DisposeAllError.prototype.constructor = DisposeAllError;
+
+  DisposeAllError.prototype.toString = function toString () {
+    return this.stack
+  };
+
+  return DisposeAllError;
+}(Error));
+
+var formatErrorStacks = function (errors) { return reduce(formatErrorStack, '', errors); };
+
+var formatErrorStack = function (s, e, i) { return s + "\n[" + ((i + 1)) + "] " + (e.stack); };
+
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
+// Try to dispose the disposable.  If it throws, send
+// the error to sink.error with the provided Time value
+var tryDispose = curry3(function (t, disposable, sink) {
+  try {
+    disposable.dispose();
+  } catch (e) {
+    sink.error(t, e);
+  }
+});
+
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
+
+export { dispose, disposeNone, disposeWith, disposeOnce, disposeAll, disposeBoth, DisposeAllError, tryDispose };
+//# sourceMappingURL=index.es.js.map
