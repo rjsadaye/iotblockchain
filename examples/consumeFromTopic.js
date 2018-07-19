@@ -4,7 +4,7 @@ const {KafkaStreams} = require("./../index.js");
 const {nativeConfig: config} = require("./../test/test-config.js");
 
 const kafkaStreams = new KafkaStreams(config);
-const stream = kafkaStreams.getKStream("test");
+const stream = kafkaStreams.getKStream("testdemo");
 
 //adding a side effect call to the stream via tap
 stream.forEach(message => {

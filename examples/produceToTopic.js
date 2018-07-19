@@ -4,11 +4,11 @@ const {KafkaStreams} = require("./../index.js");
 const {nativeConfig: config} = require("./../test/test-config.js");
 
 const kafkaStreams = new KafkaStreams(config);
-const stream = kafkaStreams.getKStream()//.from("test")
+const stream = kafkaStreams.getKStream('137.135.93.106:2181')//.from("test")
 			
 //creating a stream without topic is possible
 //no consumer will be created during stream.start()
-stream.to("test");
+stream.to("testdemo");
 //define a topic to stream messages to
 
 //start the stream

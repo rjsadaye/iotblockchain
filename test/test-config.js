@@ -11,7 +11,8 @@ const batchOptions = {
 
 const nativeConfig = {
     noptions: {
-        "metadata.broker.list": "localhost:9092", //native client requires broker hosts to connect to
+	//"metadata.broker.list": "localhost:9092"
+        "metadata.broker.list": "137.135.125.3:9092", //native client requires broker hosts to connect to
         "group.id": "kafka-streams-test-native",
         "client.id": "kafka-streams-test-name-native",
         "event_cb": true,

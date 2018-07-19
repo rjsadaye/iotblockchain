@@ -27,7 +27,7 @@ const kafkaStreams = new KafkaStreams(config);
 //creating a ktable requires a function that can be
 //used to turn the kafka messages into key-value objects
 //as tables can only be built on key-value pairs
-const table = kafkaStreams.getKTable("my-input-topic", keyValueMapperEtl);
+const table = kafkaStreams.getKTable("testdemo", keyValueMapperEtl);
 
 function keyValueMapperEtl(message){
     const elements = message.value.toLowerCase().split(" ");

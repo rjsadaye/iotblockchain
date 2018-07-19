@@ -7,7 +7,7 @@
  //    create a producer and connect to a Zookeeper to send the payloads.
  var kafka = require('kafka-node'),
      Producer = kafka.Producer,
-     client = new kafka.Client('localhost:2181'),
+     client = new kafka.Client('137.135.93.106:9092'),
      producer = new Producer(client);
 
      /*
@@ -28,7 +28,7 @@
 
      */
      payloads = [
-         { topic: 'iot', messages: 'This is the First Message I am sending', partition: 0 },
+         { topic: 'testdemo', messages: 'This is the First Message I am sending', partition: 0 },
      ];
 
 

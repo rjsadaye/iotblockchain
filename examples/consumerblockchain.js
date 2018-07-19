@@ -14,16 +14,16 @@ function puts(error, stdout, stderr) { sys.puts(stdout) }
 //exec("ls -la", puts);
 
 const kafkaStreams = new KafkaStreams(config);
-const stream = kafkaStreams.getKStream("iot").mapBufferKeyToString() //key: Buffer -> key: string
+const stream = kafkaStreams.getKStream("test").mapBufferKeyToString() //key: Buffer -> key: string
     .mapBufferValueToString(); //value: Buffer -> value: string;
 
 stream.forEach(message => {
     //input_data=message;
     //myModule.contractInsurance(message);
-    console.log(message);
+    console.log(message.value);
     
     
-    exec("node producerblockchain.js "+JSON.stringify(message), puts);
+    exec("node producerblockchain.js "+JSON.stringify(message.value), puts);
     //require('./testblockchain.js')(message);
     //require('./producerblockchain.js')(message);
     //myModule.contractInsurance(message);
